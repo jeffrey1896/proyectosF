@@ -1,0 +1,86 @@
+library ieee;
+use ieee.std_logic_1164.all;
+Entity Controlador is
+	port(
+		clock, reset, start: in std_logic;
+		LM324, LM35, N3904: in std_logic;
+		dinero,consultar, ok50, ok10: in std_logic;
+		m1,m2,m3,En324,En35,En3904,sel: out std_logic);
+end Controlador;
+
+Architecture solution of Controlador is
+Type estado is (ta,tb,tc,td,te,tf,tg,th,ti,tj,tk,tm,tn,tp,tq,tr,ts);
+signal y:estado;
+signal formato_salidas: std_logic_vector(6 downto 0);
+Begin 
+	
+	m1<=formato_salidas(0);m2<=formato_salidas(1);m3<=formato_salidas(2);En35<=formato_salidas(3);En324<=formato_salidas(4);En3904<=formato_salidas(5);sel<=formato_salidas(6);
+	process(clock,reset, start, LM324, LM35, N3904)
+	Begin	
+		if reset='0' then y <= ta;
+		elsif(clock'event and clock='1') then 
+		case y is
+			when ta => if start ='1' then y<=tb;else y<=ta; end if;
+			when tb => if start ='0' then y<=tc;else y<=tb; end if;
+			when tc => if LM35 ='1' then y<=td;
+			elsif LM324='1' then y<=te;
+			elsif N3904='1' then y<=tf;
+			elsif consultar='1' then y<=tg;
+			else y<=tc; end if;
+			when td => if LM35='0' then y<=th;
+				else y<=td; end if;
+			when te => if LM324='0' then y<=ti;
+				else y<=te; end if;
+			when tf => if N3904='0' then y<=tj;
+				else y<=tf; end if;
+			when tg => if consultar='0' then y<=tk;
+				else y<=tg; end if;
+			when th => if dinero='1' then y<=tm;
+				else y<=th; end if;
+			when ti => if dinero='1' then y<=tn;
+				else y<=ti; end if;
+			when tj => if dinero='1' then y<=tp;
+				else y<=tj; end if;
+			when tp => if dinero='0' then y<=tq;
+				else y<=tp; end if;
+			when tm => if dinero='0' then y<=ts;
+				else y<=tm; end if;
+			when tn => if dinero='0' then y<=tr;
+				else y<=tn; end if;
+			when tk => if ok50='1' then y<=ta;
+				else y<=tk; end if;
+			when ts => if ok10='1' then y<=ta;
+				else y<=ts; end if;
+			when tr => if ok10='1' then y<=ta;
+				else y<=tr; end if;
+			when tq => if ok10='1' then y<=ta;
+				else y<=tq; end if;
+		
+		end case;
+		end if;
+	end Process;
+	process(y)
+	begin 
+		formato_salidas<="0000000";
+		case y is 
+			when ta=>
+			when tb=>
+			when tc=>
+			when td=>
+			when te=>
+			when tf=>
+			when tg=>
+			when th=>
+			when ti=>
+			when tj=>
+			when tk=>formato_salidas<="0000001";
+			when tm=>
+			when tn=>
+			when tp=>
+			when tq=>formato_salidas<="0010010";
+			when tr=>formato_salidas<="1001000";
+			when ts=>formato_salidas<="0100100";
+			
+		end case;
+	end process;
+end solution;
